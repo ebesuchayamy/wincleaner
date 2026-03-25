@@ -6,7 +6,7 @@ pushd "%SCRIPT_DIR%" >nul
 set "PS_SCRIPT=%SCRIPT_DIR%win11_optimizer.ps1"
 
 if not exist "%PS_SCRIPT%" (
-    echo [ERROR] win11_optimizer.ps1 not found in %SCRIPT_DIR%
+    echo [ERROR] win11_optimizer.ps1 not found at: %PS_SCRIPT%
     popd >nul
     exit /b 1
 )
@@ -28,8 +28,7 @@ if (-not $isAdmin) { ^
 } ^
 Set-Location -Path $workDir; ^
 & $script; ^
-$exitCode = $LASTEXITCODE; ^
-if ($exitCode -eq $null) { $exitCode = 0 } ^
+$exitCode = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } elseif ($?) { 0 } else { 1 }; ^
 exit $exitCode"
 
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -Command "%PS_COMMAND%"
