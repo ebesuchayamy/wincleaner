@@ -12,12 +12,15 @@ if not exist "%PS_SCRIPT%" (
 )
 
 set "PS_COMMAND=$script = [IO.Path]::GetFullPath('%PS_SCRIPT%'); ^
+$workDir = Split-Path -Path $script; ^
+$arguments = @('-NoProfile','-ExecutionPolicy','RemoteSigned','-File', $script, '-WorkingDirectory', $workDir); ^
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator); ^
 if (-not $isAdmin) { ^
-    $p = Start-Process -FilePath 'powershell.exe' -ArgumentList '-NoProfile','-ExecutionPolicy','RemoteSigned','-File', $script -Verb RunAs -Wait -PassThru; ^
+    $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -Verb RunAs -Wait -PassThru; ^
     exit $p.ExitCode ^
 } ^
-& $script; exit $LASTEXITCODE"
+$p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -Wait -PassThru; ^
+exit $p.ExitCode"
 
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -Command "%PS_COMMAND%"
 set "EXITCODE=%ERRORLEVEL%"
