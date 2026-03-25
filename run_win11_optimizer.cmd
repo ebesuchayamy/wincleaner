@@ -11,4 +11,8 @@ if not exist "%LAUNCHER%" (
 
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "%LAUNCHER%"
 set "EXITCODE=%ERRORLEVEL%"
+if not "%EXITCODE%"=="0" (
+    echo PowerShell завершился с кодом %EXITCODE%. Ознакомьтесь с сообщениями выше.
+    pause
+)
 exit /b %EXITCODE%
