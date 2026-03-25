@@ -28,7 +28,7 @@ if (-not $isAdmin) { ^
 } ^
 Set-Location -Path $workDir; ^
 & $script; ^
-$exitCode = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } elseif ($?) { 0 } else { 1 }; ^
+$exitCode = if ($LASTEXITCODE -eq $null) { if ($?) { 0 } else { 1 } } else { $LASTEXITCODE }; ^
 exit $exitCode"
 
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -Command "%PS_COMMAND%"
