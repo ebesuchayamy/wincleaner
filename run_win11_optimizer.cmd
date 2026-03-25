@@ -16,12 +16,13 @@ $workDir = Split-Path -Path $script; ^
 $arguments = @('-NoProfile','-ExecutionPolicy','RemoteSigned','-File', $script); ^
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator); ^
 if (-not $isAdmin) { ^
-    $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory $workDir -Verb RunAs -Wait -PassThru; ^
+    $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory $workDir -Verb RunAs -PassThru; ^
+    $p.WaitForExit(); ^
     exit $p.ExitCode ^
-} else { ^
-    $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory $workDir -Wait -PassThru; ^
-    exit $p.ExitCode ^
-}"
+} ^
+Set-Location -Path $workDir; ^
+& $script; ^
+exit $LASTEXITCODE"
 
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -Command "%PS_COMMAND%"
 set "EXITCODE=%ERRORLEVEL%"
