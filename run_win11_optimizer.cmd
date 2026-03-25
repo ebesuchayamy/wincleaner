@@ -11,7 +11,7 @@ if not exist "%PS_SCRIPT%" (
     exit /b 1
 )
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%PS_SCRIPT%"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script = [IO.Path]::GetFullPath('%PS_SCRIPT%'); $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator); if (-not $isAdmin) { $p = Start-Process -FilePath 'powershell.exe' -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File', $script -Verb RunAs -Wait -PassThru; exit $p.ExitCode } & $script; exit $LASTEXITCODE"
 set "EXITCODE=%ERRORLEVEL%"
 popd >nul
 exit /b %EXITCODE%
