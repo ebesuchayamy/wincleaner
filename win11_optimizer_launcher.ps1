@@ -23,5 +23,8 @@ if (-not $isAdmin) {
 
 Set-Location -Path $workDir
 & $scriptPath
-$exitCode = if ($null -eq $LASTEXITCODE) { if ($?) { 0 } else { 1 } } else { $LASTEXITCODE }
+$exitCode = $LASTEXITCODE
+if ($null -eq $exitCode) {
+    $exitCode = if ($?) { 0 } else { 1 }
+}
 exit $exitCode
