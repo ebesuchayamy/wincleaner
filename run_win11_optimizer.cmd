@@ -14,15 +14,20 @@ if not exist "%PS_SCRIPT%" (
 set "PS_COMMAND=$script = [IO.Path]::GetFullPath('%PS_SCRIPT%'); ^
 $workDir = Split-Path -Path $script; ^
 $arguments = @('-NoProfile','-ExecutionPolicy','RemoteSigned','-File', $script); ^
+$elevationError = '[ERROR] Elevation was denied or failed.'; ^
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator); ^
 if (-not $isAdmin) { ^
-    $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory $workDir -Verb RunAs -PassThru; ^
-    $p.WaitForExit(); ^
-    exit $p.ExitCode ^
+    try { ^
+        $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory $workDir -Verb RunAs -PassThru -ErrorAction Stop; ^
+        $p.WaitForExit(); ^
+        exit $p.ExitCode ^
+    } catch { ^
+        Write-Host $elevationError; ^
+        exit 1 ^
+    } ^
 } ^
 Set-Location -Path $workDir; ^
-& $script; ^
-exit $LASTEXITCODE"
+& $script; exit $LASTEXITCODE"
 
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -Command "%PS_COMMAND%"
 set "EXITCODE=%ERRORLEVEL%"
